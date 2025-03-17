@@ -5,7 +5,7 @@ VisualStudioVersion = 17.12.35527.113 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CadastroDigital.Api", "CadastroDigital.Api\CadastroDigital.Api.csproj", "{B43A30EA-78B5-4999-8DFF-3734FD4D5C75}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CadastroDigital.Core", "CadastroDigital.Core\CadastroDigital.Core.csproj", "{F97495DB-8D4E-4897-9A07-362AC79C77B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CadastroDigital.Domain", "CadastroDigital.Domain\CadastroDigital.Domain.csproj", "{F97495DB-8D4E-4897-9A07-362AC79C77B7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CadastroDigital.Application", "CadastroDigital.Application\CadastroDigital.Application.csproj", "{D32265FF-E8C2-432D-8578-871B7D2C8E41}"
 EndProject
