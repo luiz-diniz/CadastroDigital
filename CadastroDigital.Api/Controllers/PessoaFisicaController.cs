@@ -10,7 +10,7 @@ using CadastroDigital.Application.Exceptions;
 namespace CadastroDigital.Api.Controllers
 {
     [ApiController]
-    [Route("api/pessoa/fisica")]
+    [Route("api/pessoas/fisicas")]
     public class PessoaFisicaController : ControllerBase
     {
         private readonly ILogger<PessoaFisicaController> _logger;
@@ -39,7 +39,7 @@ namespace CadastroDigital.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao criar pessoa física");
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { error = ex.Message });
             }
         }
 
@@ -55,7 +55,7 @@ namespace CadastroDigital.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao listar os dados de pessoa física");
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { error = ex.Message });
             }
         }
 
@@ -75,7 +75,7 @@ namespace CadastroDigital.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao obter pessoa física");
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { error = ex.Message });
             }
         }
 
@@ -96,7 +96,7 @@ namespace CadastroDigital.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao excluir pessoa física");
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { error = ex.Message });
             }
         }
 
@@ -107,7 +107,7 @@ namespace CadastroDigital.Api.Controllers
             {
                 await _pessoaFisicaService.AtualizarAsync(pessoaFisica.ToEntity());
 
-                return Ok(pessoaFisica);
+                return Ok();
             }
             catch (EntityNotFoundException)
             {
@@ -116,7 +116,7 @@ namespace CadastroDigital.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao atualizar pessoa física");
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { error = ex.Message });
             }
         }
     }

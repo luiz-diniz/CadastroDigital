@@ -10,7 +10,7 @@ using CadastroDigital.Application.Exceptions;
 namespace CadastroDigital.Api.Controllers
 {
     [ApiController]
-    [Route("api/pessoa/juridica")]
+    [Route("api/pessoas/juridicas")]
     public class PessoaJuridicaController : ControllerBase
     {
         private readonly ILogger<PessoaJuridicaController> _logger;
@@ -39,7 +39,7 @@ namespace CadastroDigital.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao criar pessoa jurídica");
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { error = ex.Message });
             }
         }
 
@@ -55,7 +55,7 @@ namespace CadastroDigital.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao listar os dados de pessoa jurídica");
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { error = ex.Message });
             }
         }
 
@@ -75,7 +75,7 @@ namespace CadastroDigital.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao obter pessoa jurídica");
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { error = ex.Message });
             }
         }
 
@@ -96,7 +96,7 @@ namespace CadastroDigital.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao excluir jurídica");
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { error = ex.Message });
             }
         }
 
@@ -107,7 +107,7 @@ namespace CadastroDigital.Api.Controllers
             {
                 await _pessoaJuridicaService.AtualizarAsync(pessoaJuridica.ToEntity());
 
-                return Ok(pessoaJuridica);
+                return Ok();
             }
             catch (EntityNotFoundException)
             {
@@ -116,7 +116,7 @@ namespace CadastroDigital.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao atualizar pessoa jurídica");
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { error = ex.Message });
             }
         }
     }
