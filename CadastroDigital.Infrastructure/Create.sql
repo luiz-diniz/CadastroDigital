@@ -1,6 +1,11 @@
-CREATE DATABASE CadastroDigital
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'CadastroDigital')
+BEGIN
+    CREATE DATABASE CadastroDigital;
+END
 
-USE CadastroDigital
+GO
+USE CadastroDigital;
+GO
 
 CREATE TABLE Enderecos (
     Id INT IDENTITY(1,1) PRIMARY KEY,
