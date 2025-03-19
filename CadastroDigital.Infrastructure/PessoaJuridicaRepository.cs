@@ -75,7 +75,7 @@ namespace CadastroDigital.Infrastructure
 
             await using var cmd = new SqlCommand(@"
                                 SELECT PJ.Id, PJ.Cnpj, PJ.RazaoSocial, PJ.NomeFantasia, PJ.DataAbertura, PJ.SituacaoCadastral, 
-                                        E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, E.Complemento, E.Bairro, E.Cidade, E.Estado
+                                        E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, E.Complemento, E.Bairro, E.Cidade, E.Estado, E.UF, E.Localidade, E.DDD, E.IBGE
                                 FROM PessoasJuridicas PJ
                                 LEFT JOIN Enderecos E ON PJ.EnderecoId = E.Id", conn);
 
@@ -88,6 +88,8 @@ namespace CadastroDigital.Infrastructure
                 var pessoa = new PessoaJuridica(result.GetInt32(0), result.GetString(1), result.GetString(2), result.GetString(3), result.GetDateTime(4), ObterSituacaoCadastral(result.GetInt32(5)));
 
                 var endereco = new Endereco(result.GetInt32(6), result.GetString(7), result.GetString(8), result.GetInt32(9), result.GetString(10), result.GetString(11), result.GetString(12), result.GetString(13));
+
+                endereco.IncluirDadosComplementares(result.GetString(12), result.GetString(13), result.GetString(14), result.GetString(15));
 
                 pessoa.AtualizarEndereco(endereco);
 
@@ -104,7 +106,7 @@ namespace CadastroDigital.Infrastructure
 
             await using var cmd = new SqlCommand(@"
                                 SELECT PJ.Id, PJ.Cnpj, PJ.RazaoSocial, PJ.NomeFantasia, PJ.DataAbertura, PJ.SituacaoCadastral, 
-                                        E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, E.Complemento, E.Bairro, E.Cidade, E.Estado
+                                        E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, E.Complemento, E.Bairro, E.Cidade, E.Estado, E.UF, E.Localidade, E.DDD, E.IBGE
                                 FROM PessoasJuridicas PJ
                                 LEFT JOIN Enderecos E ON PJ.EnderecoId = E.Id
                                 WHERE PJ.Id = @Id", conn);
@@ -118,6 +120,8 @@ namespace CadastroDigital.Infrastructure
                 var pessoa = new PessoaJuridica(result.GetInt32(0), result.GetString(1), result.GetString(2), result.GetString(3), result.GetDateTime(4), ObterSituacaoCadastral(result.GetInt32(5)));
 
                 var endereco = new Endereco(result.GetInt32(6), result.GetString(7), result.GetString(8), result.GetInt32(9), result.GetString(10), result.GetString(11), result.GetString(12), result.GetString(13));
+
+                endereco.IncluirDadosComplementares(result.GetString(12), result.GetString(13), result.GetString(14), result.GetString(15));
 
                 pessoa.AtualizarEndereco(endereco);
 

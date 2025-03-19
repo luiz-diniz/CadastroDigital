@@ -1,8 +1,10 @@
 ﻿using CadastroDigital.Application.Exceptions;
+using CadastroDigital.Application.Models;
 using CadastroDigital.Domain.Entities;
 using CadastroDigital.Domain.Ports.Repository;
 using CadastroDigital.Domain.Ports.Services;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace CadastroDigital.Application.Services
 {
@@ -10,13 +12,13 @@ namespace CadastroDigital.Application.Services
     {
         private readonly ILogger<PessoaJuridicaService> _logger;
         private readonly IPessoaJuridicaRepository _pessoaJuridicaRepository;
-        private readonly IEnderecoRepository _enderecoRepository;
+        private readonly IEnderecoService _enderecoService;
 
-        public PessoaJuridicaService(ILogger<PessoaJuridicaService> logger, IPessoaJuridicaRepository pessoaJuridicaRepository, IEnderecoRepository enderecoRepository)
+        public PessoaJuridicaService(ILogger<PessoaJuridicaService> logger, IPessoaJuridicaRepository pessoaJuridicaRepository, IEnderecoService enderecoService)
         {
             _logger = logger;
             _pessoaJuridicaRepository = pessoaJuridicaRepository;
-            _enderecoRepository = enderecoRepository;
+            _enderecoService = enderecoService;
         }
 
         public async Task AtualizarAsync(PessoaJuridica pessoaJuridica)
@@ -30,7 +32,7 @@ namespace CadastroDigital.Application.Services
 
                 await _pessoaJuridicaRepository.AtualizarAsync(pessoaJuridica);
 
-                await _enderecoRepository.AtualizarAsync(pessoaJuridica.Endereco);
+                await _enderecoService.AtualizarAsync(pessoaJuridica.Endereco);
             }
             catch (Exception ex)
             {
@@ -45,8 +47,8 @@ namespace CadastroDigital.Application.Services
             {
                 if (await _pessoaJuridicaRepository.VerificarExistenciaRegistro(pessoaJuridica.Cnpj))
                     throw new EntityAlreadyExistsException($"Pessoa jurídica com o CNPJ {pessoaJuridica.Cnpj} já cadastrada");
-
-                var idEndereco = await _enderecoRepository.CriarAsync(pessoaJuridica.Endereco);
+               
+                var idEndereco = await _enderecoService.CriarAsync(pessoaJuridica.Endereco);
 
                 pessoaJuridica.Endereco.AtribuirId(idEndereco);
 
@@ -70,7 +72,7 @@ namespace CadastroDigital.Application.Services
                 if (pessoa is null)
                     throw new EntityNotFoundException($"Pessoa jurídica com o Id {id} não encontrada");
 
-                await _enderecoRepository.ExcluirAsync(pessoa.Endereco.Id);
+                await _enderecoService.ExcluirAsync(pessoa.Endereco.Id);
 
                 await _pessoaJuridicaRepository.ExcluirAsync(id);
             }

@@ -10,13 +10,13 @@ namespace CadastroDigital.Application.Services
     {
         private readonly ILogger<PessoaFisicaService> _logger;
         private readonly IPessoaFisicaRepository _pessoaFisicaRepository;
-        private readonly IEnderecoRepository _enderecoRepository;
+        private readonly IEnderecoService _enderecoService;
 
-        public PessoaFisicaService(ILogger<PessoaFisicaService> logger, IPessoaFisicaRepository pessoaFisicaRepository, IEnderecoRepository enderecoRepository)
+        public PessoaFisicaService(ILogger<PessoaFisicaService> logger, IPessoaFisicaRepository pessoaFisicaRepository, IEnderecoService enderecoService)
         {
             _logger = logger;
             _pessoaFisicaRepository = pessoaFisicaRepository;
-            _enderecoRepository = enderecoRepository;
+            _enderecoService = enderecoService;
         }
 
         public async Task AtualizarAsync(PessoaFisica pessoaFisica)
@@ -30,7 +30,7 @@ namespace CadastroDigital.Application.Services
 
                 await _pessoaFisicaRepository.AtualizarAsync(pessoaFisica);
 
-                await _enderecoRepository.AtualizarAsync(pessoaFisica.Endereco);
+                await _enderecoService.AtualizarAsync(pessoaFisica.Endereco);
             }
             catch (Exception ex)
             {
@@ -45,8 +45,8 @@ namespace CadastroDigital.Application.Services
             {
                 if(await _pessoaFisicaRepository.VerificarExistenciaRegistro(pessoaFisica.Cpf))
                     throw new EntityAlreadyExistsException($"Pessoa física com o CPF {pessoaFisica.Cpf} já cadastrada");
-
-                var idEndereco = await _enderecoRepository.CriarAsync(pessoaFisica.Endereco);
+                
+                var idEndereco = await _enderecoService.CriarAsync(pessoaFisica.Endereco);
 
                 pessoaFisica.Endereco.AtribuirId(idEndereco);
 
@@ -70,7 +70,7 @@ namespace CadastroDigital.Application.Services
                 if(pessoa is null)
                     throw new EntityNotFoundException($"Pessoa física com o Id {id} não encontrada");
 
-                await _enderecoRepository.ExcluirAsync(pessoa.Endereco.Id);
+                await _enderecoService.ExcluirAsync(pessoa.Endereco.Id);
 
                 await _pessoaFisicaRepository.ExcluirAsync(id);
             }

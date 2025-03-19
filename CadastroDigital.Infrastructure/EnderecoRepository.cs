@@ -19,7 +19,8 @@ namespace CadastroDigital.Infrastructure
             await using var conn = new SqlConnection(_connectionString);
             await conn.OpenAsync();
 
-            var query = @"UPDATE Enderecos SET Cep = @Cep, Logradouro = @Logradouro, Numero = @Numero, Complemento = @Complemento, Bairro = @Bairro, Cidade = @Cidade, Estado = @Estado WHERE Id = @Id";
+            var query = @"UPDATE Enderecos SET Cep = @Cep, Logradouro = @Logradouro, Numero = @Numero, Complemento = @Complemento, 
+                                               Bairro = @Bairro, Cidade = @Cidade, Estado = @Estado WHERE Id = @Id";
 
             await using var cmd = new SqlCommand(query, conn);
 
@@ -40,8 +41,8 @@ namespace CadastroDigital.Infrastructure
             await using var conn = new SqlConnection(_connectionString);
             await conn.OpenAsync();
 
-            var query = @"INSERT INTO Enderecos (Cep, Logradouro, Numero, Complemento, Bairro, Cidade, Estado) OUTPUT Inserted.Id 
-                            VALUES (@Cep, @Logradouro, @Numero, @Complemento, @Bairro, @Cidade, @Estado)";
+            var query = @"INSERT INTO Enderecos (Cep, Logradouro, Numero, Complemento, Bairro, Cidade, Estado, UF, Localidade, DDD, IBGE) OUTPUT Inserted.Id 
+                            VALUES (@Cep, @Logradouro, @Numero, @Complemento, @Bairro, @Cidade, @Estado, @UF, @Localidade, @DDD, @IBGE)";
 
             await using var cmd = new SqlCommand(query, conn);
 
@@ -52,6 +53,11 @@ namespace CadastroDigital.Infrastructure
             cmd.Parameters.AddWithValue("Bairro", endereco.Bairro);
             cmd.Parameters.AddWithValue("Cidade", endereco.Cidade);
             cmd.Parameters.AddWithValue("Estado", endereco.Estado);
+
+            cmd.Parameters.AddWithValue("UF", DBNullValue(endereco.UF));
+            cmd.Parameters.AddWithValue("Localidade", DBNullValue(endereco.Localidade));
+            cmd.Parameters.AddWithValue("DDD", DBNullValue(endereco.Ddd));
+            cmd.Parameters.AddWithValue("IBGE", DBNullValue(endereco.Ibge));
 
             var result = await cmd.ExecuteScalarAsync();
 
@@ -70,6 +76,11 @@ namespace CadastroDigital.Infrastructure
             cmd.Parameters.AddWithValue("Id", id);
 
             await cmd.ExecuteNonQueryAsync();
+        }
+
+        private object DBNullValue(string? valor)
+        {
+            return string.IsNullOrEmpty(valor) ? DBNull.Value : valor;
         }
     }
 }

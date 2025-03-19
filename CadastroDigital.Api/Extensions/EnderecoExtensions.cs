@@ -9,7 +9,7 @@ namespace CadastroDigital.Api.Extensions
         {
             if (dto == null) throw new ArgumentNullException(nameof(dto));
 
-            return new Endereco(
+            var endereco = new Endereco(
                 dto.Id,
                 dto.Cep,                     
                 dto.Logradouro,              
@@ -17,8 +17,12 @@ namespace CadastroDigital.Api.Extensions
                 dto.Complemento,             
                 dto.Bairro,                  
                 dto.Cidade,                  
-                dto.Estado                   
+                dto.Estado
             );
+
+            endereco.IncluirDadosComplementares(dto.UF, dto.Localidade, dto.Ddd, dto.Ibge);
+
+            return endereco;
         }
 
         public static EnderecoDto ToDto(this Endereco entity)
@@ -34,7 +38,11 @@ namespace CadastroDigital.Api.Extensions
                 Complemento = entity.Complemento,
                 Bairro = entity.Bairro,
                 Cidade = entity.Cidade,
-                Estado = entity.Estado
+                Estado = entity.Estado,
+                UF = entity.UF,
+                Localidade = entity.Localidade,
+                Ddd = entity.Ddd,
+                Ibge = entity.Ibge
             };
         }
     }

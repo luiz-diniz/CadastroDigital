@@ -10,7 +10,11 @@ CREATE TABLE Enderecos (
     Complemento NVARCHAR(255) NULL,
     Bairro NVARCHAR(100) NOT NULL,
     Cidade NVARCHAR(100) NOT NULL,
-    Estado CHAR(2) NOT NULL
+	Estado NVARCHAR(50) NOT NULL,
+	UF CHAR(2) NULL,
+	Localidade NVARCHAR(100) NULL,
+	DDD NVARCHAR(14) NULL,
+	IBGE CHAR(7) NULL
 );
 
 CREATE TABLE PessoasFisicas (
@@ -29,7 +33,7 @@ CREATE TABLE PessoasJuridicas (
     RazaoSocial NVARCHAR(150) NOT NULL,
     NomeFantasia NVARCHAR(150) NOT NULL,
     DataAbertura DATE NOT NULL,
-    SituacaoCadastralId INT NOT NULL,
+    SituacaoCadastral INT NOT NULL,
     EnderecoId INT NULL,
 
     CONSTRAINT FK_PessoaJuridica_Endereco FOREIGN KEY (EnderecoId) REFERENCES Enderecos(Id) ON DELETE SET NULL,

@@ -44,7 +44,7 @@ namespace CadastroDigital.Domain.Entities
                 throw new ValidationException("CNPJ é obrigatório");
 
             //TODO: Implementar validação de CNPJ
-            if (cnpj.Length != 14)
+            if (cnpj.Length != 18)
                 throw new ValidationException("CNPJ está inválido");
 
             if (string.IsNullOrEmpty(razaoSocial))

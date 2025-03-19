@@ -68,7 +68,7 @@ namespace CadastroDigital.Infrastructure
 
             await using var cmd = new SqlCommand(@"
                                 SELECT PF.Id, PF.Cpf, PF.Nome, PF.DataNascimento, 
-                                        E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, E.Complemento, E.Bairro, E.Cidade, E.Estado
+                                        E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, E.Complemento, E.Bairro, E.Cidade, E.Estado, E.UF, E.Localidade, E.DDD, E.IBGE
                                 FROM PessoasFisicas PF
                                 LEFT JOIN Enderecos E ON PF.EnderecoId = E.Id", conn);
 
@@ -81,6 +81,8 @@ namespace CadastroDigital.Infrastructure
                 var pessoa = new PessoaFisica(result.GetInt32(0), result.GetString(1), result.GetString(2), result.GetDateTime(3));
 
                 var endereco = new Endereco(result.GetInt32(4), result.GetString(5), result.GetString(6), result.GetInt32(7), result.GetString(8), result.GetString(9), result.GetString(10), result.GetString(11));
+
+                endereco.IncluirDadosComplementares(result.GetString(12), result.GetString(13), result.GetString(14), result.GetString(15));
 
                 pessoa.AtualizarEndereco(endereco);
 
@@ -96,7 +98,7 @@ namespace CadastroDigital.Infrastructure
             await conn.OpenAsync();
 
             await using var cmd = new SqlCommand(@"SELECT PF.Id, PF.Cpf, PF.Nome, PF.DataNascimento, 
-                                        E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, E.Complemento, E.Bairro, E.Cidade, E.Estado
+                                        E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, E.Complemento, E.Bairro, E.Cidade, E.Estado, E.UF, E.Localidade, E.DDD, E.IBGE
                                     FROM PessoasFisicas PF
                                     LEFT JOIN Enderecos E ON PF.EnderecoId = E.Id
                                     WHERE PF.Id = @Id", conn);
@@ -110,6 +112,8 @@ namespace CadastroDigital.Infrastructure
                 var pessoa = new PessoaFisica(result.GetInt32(0), result.GetString(1), result.GetString(2), result.GetDateTime(3));
 
                 var endereco = new Endereco(result.GetInt32(4), result.GetString(5), result.GetString(6), result.GetInt32(7), result.GetString(8), result.GetString(9), result.GetString(10), result.GetString(11));
+
+                endereco.IncluirDadosComplementares(result.GetString(12), result.GetString(13), result.GetString(14), result.GetString(15));
 
                 pessoa.AtualizarEndereco(endereco);
 

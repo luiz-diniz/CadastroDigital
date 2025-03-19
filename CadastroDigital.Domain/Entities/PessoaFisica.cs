@@ -37,7 +37,7 @@ namespace CadastroDigital.Domain.Entities
                 throw new ValidationException("CPF é obrigatório");
 
             //TODO: Implementar validação de CPF
-            if (cpf.Length != 11)
+            if (cpf.Length != 14)
                 throw new ValidationException("CPF está inválido");
 
             if (string.IsNullOrEmpty(nome))
