@@ -1,0 +1,270 @@
+{
+	"info": {
+		"_postman_id": "61535d6e-1932-4dce-801e-31f155d75d57",
+		"name": "ConsultaDigital",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12666732"
+	},
+	"item": [
+		{
+			"name": "PF",
+			"item": [
+				{
+					"name": "Criar",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"cpf\": \"000.000.000-00\",\r\n  \"nome\": \"Luiz\",\r\n  \"dataNascimento\": \"1999-05-11T00:00:00.000Z\",\r\n  \"endereco\": {\r\n    \"cep\": \"01310000\",\r\n    \"logradouro\": \"Avenida Paulista\",\r\n    \"numero\": 10,\r\n    \"complemento\": \"Próximo ao MASP\",\r\n    \"bairro\": \"Bela Vista\",\r\n    \"cidade\": \"São Paulo\",\r\n    \"estado\": \"São Paulo\"\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7241/api/pessoas/fisicas",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7241",
+							"path": [
+								"api",
+								"pessoas",
+								"fisicas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7241/api/pessoas/fisicas",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7241",
+							"path": [
+								"api",
+								"pessoas",
+								"fisicas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"cpf\": \"000.000.000-01\",\r\n  \"nome\": \"Luiz Diniz\",\r\n  \"dataNascimento\": \"1999-05-11T00:00:00.000Z\",\r\n  \"id\": 2,\r\n  \"endereco\": {\r\n    \"id\": 2,\r\n    \"cep\": \"01310000\",\r\n    \"logradouro\": \"Avenida Paulista\",\r\n    \"numero\": 101,\r\n    \"complemento\": \"Próximo ao MASP e ao Shopping\",\r\n    \"bairro\": \"Cerqueira César\",\r\n    \"cidade\": \"São Paulo\",\r\n    \"estado\": \"São Paulo\",\r\n    \"uf\": \"SP\",\r\n    \"localidade\": \"São Paulo\",\r\n    \"ddd\": \"11\",\r\n    \"ibge\": \"3550308\"\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7241/api/pessoas/fisicas",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7241",
+							"path": [
+								"api",
+								"pessoas",
+								"fisicas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obter",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7241/api/pessoas/fisicas/1",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7241",
+							"path": [
+								"api",
+								"pessoas",
+								"fisicas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7241/api/pessoas/fisicas/2",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7241",
+							"path": [
+								"api",
+								"pessoas",
+								"fisicas",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PJ",
+			"item": [
+				{
+					"name": "Criar",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"cpf\": \"000.000.000-00\",\r\n  \"nome\": \"Luiz\",\r\n  \"dataNascimento\": \"1999-05-11T00:00:00.000Z\",\r\n  \"endereco\": {\r\n    \"cep\": \"01310000\",\r\n    \"logradouro\": \"Avenida Paulista\",\r\n    \"numero\": 10,\r\n    \"complemento\": \"Próximo ao MASP\",\r\n    \"bairro\": \"Bela Vista\",\r\n    \"cidade\": \"São Paulo\",\r\n    \"estado\": \"São Paulo\"\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7241/api/pessoas/fisicas",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7241",
+							"path": [
+								"api",
+								"pessoas",
+								"fisicas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7241/api/pessoas/juridicas",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7241",
+							"path": [
+								"api",
+								"pessoas",
+								"juridicas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"cnpj\": \"00.000.000/0001-00\",\r\n        \"razaoSocial\": \"empresa x ltda\",\r\n        \"nomeFantasia\": \"empresa x\",\r\n        \"dataAbertura\": \"2020-03-19T00:00:00\",\r\n        \"situacaoCadastral\": 2,\r\n        \"id\": 1,\r\n        \"endereco\": {\r\n            \"id\": 4,\r\n            \"cep\": \"01310000\",\r\n            \"logradouro\": \"Avenida Paulista\",\r\n            \"numero\": 10,\r\n            \"complemento\": \"Próximo ao MASP\",\r\n            \"bairro\": \"Bela Vista\",\r\n            \"cidade\": \"São Paulo\",\r\n            \"estado\": \"São Paulo\",\r\n            \"uf\": \"São Paulo\",\r\n            \"localidade\": \"São Paulo\",\r\n            \"ddd\": \"SP\",\r\n            \"ibge\": \"São Paulo\"\r\n        }\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7241/api/pessoas/juridicas",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7241",
+							"path": [
+								"api",
+								"pessoas",
+								"juridicas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obter",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7241/api/pessoas/juridicas/1",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7241",
+							"path": [
+								"api",
+								"pessoas",
+								"juridicas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7241/api/pessoas/juridicas/2",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7241",
+							"path": [
+								"api",
+								"pessoas",
+								"juridicas",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
