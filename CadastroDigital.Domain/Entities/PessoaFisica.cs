@@ -2,7 +2,7 @@
 
 namespace CadastroDigital.Domain.Entities
 {
-    public class PessoaFisica : Pessoa
+    public class PessoaFisica : PessoaBase
     {
         public string Cpf { get; private set; }
         public string Nome { get; private set; }
@@ -10,24 +10,25 @@ namespace CadastroDigital.Domain.Entities
 
         public PessoaFisica(int id, string cpf, string nome, DateTime dataNascimento)
         {
-            if (id <= 0)
-                throw new ValidationException("Id deve ser maior que zero");
+            Id = id;
 
             Validar(cpf, nome, dataNascimento);
 
-            Id = id;
             Cpf = cpf;
             Nome = nome;
             DataNascimento = dataNascimento;
         }
 
-        public PessoaFisica(string cpf, string nome, DateTime dataNascimento)
+        public PessoaFisica(int id, string cpf, string nome, DateTime dataNascimento, Endereco endereco)
         {
+            Id = id;
+
             Validar(cpf, nome, dataNascimento);
 
             Cpf = cpf;
             Nome = nome;
             DataNascimento = dataNascimento;
+            Endereco = endereco;
         }
 
         private void Validar(string cpf, string nome, DateTime dataNascimento)

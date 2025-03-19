@@ -14,8 +14,10 @@ namespace CadastroDigital.Domain.Entities
         public string Cidade { get; private set; }
         public string Estado { get; private set; }
 
-        public Endereco(string cep, string logradouro, int numero, string complemento, string bairro, string cidade, string estado)
+        public Endereco(int id, string cep, string logradouro, int numero, string complemento, string bairro, string cidade, string estado)
         {
+            Id = id;
+
             Validar(cep, logradouro, numero, bairro, cidade, estado);
 
             Cep = cep;
@@ -27,12 +29,17 @@ namespace CadastroDigital.Domain.Entities
             Estado = estado;
         }
 
+        public void AtribuirId(int id)
+        {
+            Id = id;
+        }
+
         private void Validar(string cep, string logradouro, int numero, string bairro, string cidade, string estado)
         {
             if (string.IsNullOrEmpty(cep))
                 throw new ValidationException("CEP é obrigatório");
 
-            if (Regex.IsMatch(cep, "^[0-9]{8}$"))
+            if (!Regex.IsMatch(cep, "^[0-9]{8}$"))
                 throw new ValidationException("CEP deve conter apenas 8 números");
 
             if (string.IsNullOrEmpty(logradouro))

@@ -1,17 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CadastroDigital.Domain.Entities.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace CadastroDigital.Domain.Entities
 {
-    public class PessoaJuridica : Pessoa
+    public class PessoaJuridica : PessoaBase
     {
         public string Cnpj { get; private set; }
         public string RazaoSocial { get; private set; }
         public string NomeFantasia { get; private set; }
         public DateTime DataAbertura { get; private set; }
-        public Enum SituacaoCadastral { get; private set; }
+        public SituacaoCadastralEnum SituacaoCadastral { get; private set; }
 
-        public PessoaJuridica(string cnpj, string razaoSocial, string nomeFantasia, DateTime dataAbertura, Enum situacaoCadastral)
+        public PessoaJuridica(int id, string cnpj, string razaoSocial, string nomeFantasia, DateTime dataAbertura, SituacaoCadastralEnum situacaoCadastral)
         {
+            Id = id;
+
             Validar(cnpj, razaoSocial, nomeFantasia, dataAbertura, situacaoCadastral);
 
             Cnpj = cnpj;
@@ -21,7 +24,21 @@ namespace CadastroDigital.Domain.Entities
             SituacaoCadastral = situacaoCadastral;
         }
 
-        private void Validar(string cnpj, string razaoSocial, string nomeFantasia, DateTime dataAbertura, Enum situacaoCadastral)
+        public PessoaJuridica(int id, string cnpj, string razaoSocial, string nomeFantasia, DateTime dataAbertura, SituacaoCadastralEnum situacaoCadastral, Endereco endereco)
+        {
+            Id = id;
+
+            Validar(cnpj, razaoSocial, nomeFantasia, dataAbertura, situacaoCadastral);
+
+            Cnpj = cnpj;
+            RazaoSocial = razaoSocial;
+            NomeFantasia = nomeFantasia;
+            DataAbertura = dataAbertura;
+            SituacaoCadastral = situacaoCadastral;
+            Endereco = endereco;
+        }
+
+        private void Validar(string cnpj, string razaoSocial, string nomeFantasia, DateTime dataAbertura, SituacaoCadastralEnum situacaoCadastral)
         {
             if (string.IsNullOrEmpty(cnpj))
                 throw new ValidationException("CNPJ é obrigatório");
@@ -38,9 +55,6 @@ namespace CadastroDigital.Domain.Entities
 
             if (dataAbertura == DateTime.MinValue)
                 throw new ValidationException("Data de Abertura é obrigatório");
-
-            if (situacaoCadastral == null)
-                throw new ValidationException("Situação Cadastral é obrigatório");
         }
     }
 }
