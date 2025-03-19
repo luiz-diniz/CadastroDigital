@@ -9,6 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddLogging();
+builder.Services.AddHttpClient<IIntegracaoCep, IntegracaoViaCepService>();
 
 var connectionString = builder.Configuration.GetConnectionString("Default");
 
@@ -21,6 +22,8 @@ builder.Services.AddSingleton<IEnderecoRepository>(new EnderecoRepository(connec
 
 builder.Services.AddSingleton<IPessoaFisicaService, PessoaFisicaService>();
 builder.Services.AddSingleton<IPessoaJuridicaService, PessoaJuridicaService>();
+builder.Services.AddSingleton<IEnderecoService, EnderecoService>();
+builder.Services.AddSingleton<IIntegracaoCep, IntegracaoViaCepService>();
 
 var app = builder.Build();
 
@@ -29,7 +32,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 
 app.UseHttpsRedirection();
 
