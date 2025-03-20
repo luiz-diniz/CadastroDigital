@@ -123,14 +123,14 @@ namespace CadastroDigital.Infrastructure
             return null;
         }
 
-        public async Task<bool> VerificarExistenciaRegistro(string cpf)
+        public async Task<bool> VerificarExistenciaRegistro(PessoaFisica pessoa)
         {
             await using var conn = new SqlConnection(_connectionString);
             await conn.OpenAsync();
 
             await using var cmd = new SqlCommand("SELECT COUNT(1) FROM PessoasFisicas WHERE Cpf = @Cpf", conn);
 
-            cmd.Parameters.AddWithValue("Cpf", cpf);
+            cmd.Parameters.AddWithValue("Cpf", pessoa.Cpf);
 
             var result = await cmd.ExecuteScalarAsync();
 

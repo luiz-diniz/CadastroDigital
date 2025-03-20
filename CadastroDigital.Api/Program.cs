@@ -1,4 +1,5 @@
 using CadastroDigital.Application.Services;
+using CadastroDigital.Domain.Entities;
 using CadastroDigital.Domain.Ports.Repository;
 using CadastroDigital.Domain.Ports.Services;
 using CadastroDigital.Infrastructure;
@@ -16,12 +17,11 @@ var connectionString = builder.Configuration.GetConnectionString("Default");
 if(string.IsNullOrEmpty(connectionString))
     throw new ArgumentNullException("Connection string null");
 
-builder.Services.AddSingleton<IPessoaFisicaRepository>(new PessoaFisicaRepository(connectionString));
-builder.Services.AddSingleton<IPessoaJuridicaRepository>(new PessoaJuridicaRepository(connectionString));
+builder.Services.AddSingleton<IPessoaRepository<PessoaFisica>>(new PessoaFisicaRepository(connectionString));
+builder.Services.AddSingleton<IPessoaRepository<PessoaJuridica>>(new PessoaJuridicaRepository(connectionString));
 builder.Services.AddSingleton<IEnderecoRepository>(new EnderecoRepository(connectionString));
 
-builder.Services.AddSingleton<IPessoaFisicaService, PessoaFisicaService>();
-builder.Services.AddSingleton<IPessoaJuridicaService, PessoaJuridicaService>();
+builder.Services.AddSingleton(typeof(IPessoaService<>), typeof(PessoaService<>));
 builder.Services.AddSingleton<IEnderecoService, EnderecoService>();
 builder.Services.AddSingleton<IIntegracaoCep, IntegracaoViaCepService>();
 

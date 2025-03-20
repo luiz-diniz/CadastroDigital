@@ -131,14 +131,14 @@ namespace CadastroDigital.Infrastructure
             return null;
         }
 
-        public async Task<bool> VerificarExistenciaRegistro(string cnpj)
+        public async Task<bool> VerificarExistenciaRegistro(PessoaJuridica pessoa)
         {
             await using var conn = new SqlConnection(_connectionString);
             await conn.OpenAsync();
 
             await using var cmd = new SqlCommand("SELECT COUNT(1) FROM PessoasJuridicas WHERE Cnpj = @Cnpj", conn);
 
-            cmd.Parameters.AddWithValue("Cnpj", cnpj);
+            cmd.Parameters.AddWithValue("Cnpj", pessoa.Cnpj);
 
             var result = await cmd.ExecuteScalarAsync();
 

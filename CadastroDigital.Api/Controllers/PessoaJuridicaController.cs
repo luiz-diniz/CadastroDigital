@@ -14,9 +14,9 @@ namespace CadastroDigital.Api.Controllers
     public class PessoaJuridicaController : ControllerBase
     {
         private readonly ILogger<PessoaJuridicaController> _logger;
-        private readonly IPessoaJuridicaService _pessoaJuridicaService;
+        private readonly IPessoaService<PessoaJuridica> _pessoaJuridicaService;
 
-        public PessoaJuridicaController(ILogger<PessoaJuridicaController> logger, IPessoaJuridicaService pessoaJuridicaService)
+        public PessoaJuridicaController(ILogger<PessoaJuridicaController> logger, IPessoaService<PessoaJuridica> pessoaJuridicaService)
         {
             _logger = logger;
             _pessoaJuridicaService = pessoaJuridicaService;
