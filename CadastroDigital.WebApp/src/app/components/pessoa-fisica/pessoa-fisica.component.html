@@ -1,0 +1,108 @@
+<p-button (onClick)="novoRegistro = !novoRegistro">
+    {{ novoRegistro ? 'Cancelar' : 'Novo Registro' }}
+</p-button>
+
+<!-- Form de cadastro -->
+<form *ngIf="novoRegistro" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <h3>Pessoa</h3>
+    <p-floatLabel>
+        <input id="name" type="text" pInputText formControlName="nome"/>
+        <label for="name">Nome</label>
+    </p-floatLabel>
+
+    <p-floatLabel>
+        <input id="cpf" type="text" pInputText formControlName="cpf"/>
+        <label for="cpf">CPF (Ex: 000.000.000-00)</label>
+    </p-floatLabel>
+
+    <p-floatLabel>
+        <p-calendar 
+        formControlName="dataNascimento" 
+        [iconDisplay]="'input'" 
+        [showIcon]="true" 
+        inputId="icondisplay" />
+        <label for="cpf">Data de Nascimento</label>
+    </p-floatLabel>   
+    
+    <h3>Endereço</h3>
+    <p-floatLabel>
+        <input id="cep" type="text" pInputText formControlName="cep"/>
+        <label for="cep">CEP (Ex: 00000-000)</label>
+    </p-floatLabel>
+
+    <p-floatLabel>
+        <input id="logradouro" type="text" pInputText formControlName="logradouro"/>
+        <label for="logradouro">Logradouro</label>
+    </p-floatLabel>
+
+    <p-floatLabel>
+        <input id="numero" type="number" pInputText formControlName="numero"/>
+        <label for="numero">Numero</label>
+    </p-floatLabel>
+
+    <p-floatLabel>
+        <input id="complemento" type="text" pInputText formControlName="complemento"/>
+        <label for="complemento">Complemento</label>
+    </p-floatLabel>
+
+    <p-floatLabel>
+        <input id="bairro" type="text" pInputText formControlName="bairro"/>
+        <label for="bairro">Bairro</label>
+    </p-floatLabel>
+
+    <p-floatLabel>
+        <input id="cidade" type="text" pInputText formControlName="cidade"/>
+        <label for="cidade">Cidade</label>
+    </p-floatLabel>
+
+    <p-floatLabel>
+        <input id="estado" type="text" pInputText formControlName="estado"/>
+        <label for="estado">Estado</label>
+    </p-floatLabel>
+
+    <p-button type="submit" label="Enviar" />
+</form>
+
+<!-- Tabela com os dados -->
+<p-table [value]="pessoas" [paginator]="true" [rows]="5">
+    <ng-template pTemplate="header">
+        <tr>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Data de Nascimento</th>
+            <th>CEP</th>
+            <th>Logradouro</th>
+            <th>Numero</th>
+            <th>Complemento</th>
+            <th>Bairro</th>
+            <th>Cidade</th>
+            <th>Estado</th>
+            <th>UF</th>
+            <th>Localidade</th>
+            <th>DDD</th>
+            <th>IBGE</th>
+            <th style="width: 5rem"></th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-pessoa>
+        <tr>
+            <td>{{ pessoa.nome }}</td>
+            <td>{{ pessoa.cpf }}</td>
+            <td>{{ pessoa.dataNascimento }}</td>
+            <td>{{ pessoa.endereco.cep }}</td>
+            <td>{{ pessoa.endereco.logradouro }}</td>
+            <td>{{ pessoa.endereco.numero }}</td>
+            <td>{{ pessoa.endereco.complemento }}</td>
+            <td>{{ pessoa.endereco.bairro }}</td>
+            <td>{{ pessoa.endereco.cidade }}</td>
+            <td>{{ pessoa.endereco.estado }}</td>
+            <td>{{ pessoa.endereco.uf }}</td>
+            <td>{{ pessoa.endereco.localidade }}</td>
+            <td>{{ pessoa.endereco.ddd }}</td>
+            <td>{{ pessoa.endereco.ibge }}</td>
+            <td>
+                <p-button icon="pi pi-trash" (click)="excluir(pessoa.id)" severity="secondary" rounded />
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
