@@ -63,8 +63,8 @@ namespace CadastroDigital.Infrastructure
         {
             await using var conn = new SqlConnection(_connectionString);
 
-            var query = @"SELECT PF.Id, PF.Cpf, PF.Nome, PF.DataNascimento, 
-                         E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, 
+            var query = @"SELECT PF.Id, PF.Cpf, PF.Nome, PF.DataNascimento,
+                         E.Id, E.Cep, E.Logradouro, E.Numero, 
                          E.Complemento, E.Bairro, E.Cidade, E.Estado, E.UF, 
                          E.Localidade, E.DDD, E.IBGE
                   FROM PessoasFisicas PF
@@ -81,7 +81,7 @@ namespace CadastroDigital.Infrastructure
                     }
                     return pessoa;
                 },
-                splitOn: "EnderecoId"
+                splitOn: "Id"
             );
 
             return pessoasFisicas;
@@ -92,7 +92,7 @@ namespace CadastroDigital.Infrastructure
             await using var conn = new SqlConnection(_connectionString);
 
             var query = @"SELECT PF.Id, PF.Cpf, PF.Nome, PF.DataNascimento, 
-                         E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, 
+                         E.Id, E.Cep, E.Logradouro, E.Numero, 
                          E.Complemento, E.Bairro, E.Cidade, E.Estado, E.UF, 
                          E.Localidade, E.DDD, E.IBGE
                   FROM PessoasFisicas PF
@@ -112,7 +112,7 @@ namespace CadastroDigital.Infrastructure
                     return pessoa;
                 },
                 new { Id = id },
-                splitOn: "EnderecoId"
+                splitOn: "Id"
             ).FirstOrDefault();
 
             return pessoa;
