@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection.PortableExecutable;
 using System.Text.RegularExpressions;
 
 namespace CadastroDigital.Domain.Entities
@@ -34,6 +36,10 @@ namespace CadastroDigital.Domain.Entities
             Bairro = bairro;
             Cidade = cidade;
             Estado = estado;
+        }
+
+        private Endereco()
+        {
         }
 
         public void AtribuirId(int id)

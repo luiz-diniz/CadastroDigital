@@ -1,5 +1,6 @@
 ﻿using CadastroDigital.Domain.Entities;
 using CadastroDigital.Domain.Ports.Repository;
+using Dapper;
 using Microsoft.Data.SqlClient;
 
 namespace CadastroDigital.Infrastructure
@@ -20,14 +21,13 @@ namespace CadastroDigital.Infrastructure
 
             var query = "UPDATE PessoasFisicas SET Nome = @Nome, Cpf = @Cpf, DataNascimento = @DataNascimento WHERE Id = @Id";
 
-            await using var cmd = new SqlCommand(query, conn);
-
-            cmd.Parameters.AddWithValue("Id", pessoaFisica.Id);
-            cmd.Parameters.AddWithValue("Nome", pessoaFisica.Nome);
-            cmd.Parameters.AddWithValue("Cpf", pessoaFisica.Cpf);
-            cmd.Parameters.AddWithValue("DataNascimento", pessoaFisica.DataNascimento);
-
-            await cmd.ExecuteNonQueryAsync();
+            conn.Execute(query, new
+            {
+                pessoaFisica.Id,
+                pessoaFisica.Nome,
+                pessoaFisica.Cpf,
+                pessoaFisica.DataNascimento
+            });            
         }
 
         public async Task<int> CriarAsync(PessoaFisica pessoaFisica)
@@ -37,16 +37,16 @@ namespace CadastroDigital.Infrastructure
 
             var query = "INSERT INTO PessoasFisicas (Nome, Cpf, DataNascimento, EnderecoId) OUTPUT Inserted.Id VALUES (@Nome, @Cpf, @DataNascimento, @EnderecoId)";
 
-            await using var cmd = new SqlCommand(query, conn);
+            var result = conn.QuerySingle<int>(query, new
+            {
+                pessoaFisica.Id,
+                pessoaFisica.Nome,
+                pessoaFisica.Cpf,
+                pessoaFisica.DataNascimento,
+                EnderecoId = pessoaFisica.Endereco.Id
+            });
 
-            cmd.Parameters.AddWithValue("Nome", pessoaFisica.Nome);
-            cmd.Parameters.AddWithValue("Cpf", pessoaFisica.Cpf);
-            cmd.Parameters.AddWithValue("DataNascimento", pessoaFisica.DataNascimento);
-            cmd.Parameters.AddWithValue("EnderecoId", pessoaFisica.Endereco.Id);
-
-            var result = await cmd.ExecuteScalarAsync();
-
-            return (int)result!;
+            return result;
         }
 
         public async Task ExcluirAsync(int id)
@@ -54,40 +54,35 @@ namespace CadastroDigital.Infrastructure
             await using var conn = new SqlConnection(_connectionString);
             await conn.OpenAsync();
 
-            await using var cmd = new SqlCommand("DELETE FROM PessoasFisicas WHERE Id = @Id", conn);
+            var query = "DELETE FROM PessoasFisicas WHERE Id = @Id";
 
-            cmd.Parameters.AddWithValue("Id", id);
-
-            await cmd.ExecuteNonQueryAsync();
+            conn.Execute(query, new { id });
         }
 
         public async Task<IEnumerable<PessoaFisica>> ListarAsync()
         {
             await using var conn = new SqlConnection(_connectionString);
-            await conn.OpenAsync();
 
-            await using var cmd = new SqlCommand(@"
-                                SELECT PF.Id, PF.Cpf, PF.Nome, PF.DataNascimento, 
-                                        E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, E.Complemento, E.Bairro, E.Cidade, E.Estado, E.UF, E.Localidade, E.DDD, E.IBGE
-                                FROM PessoasFisicas PF
-                                LEFT JOIN Enderecos E ON PF.EnderecoId = E.Id", conn);
+            var query = @"SELECT PF.Id, PF.Cpf, PF.Nome, PF.DataNascimento, 
+                         E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, 
+                         E.Complemento, E.Bairro, E.Cidade, E.Estado, E.UF, 
+                         E.Localidade, E.DDD, E.IBGE
+                  FROM PessoasFisicas PF
+                  LEFT JOIN Enderecos E ON PF.EnderecoId = E.Id";
 
-            var result = await cmd.ExecuteReaderAsync();
-
-            var pessoasFisicas = new List<PessoaFisica>();
-
-            while (await result.ReadAsync())
-            {
-                var pessoa = new PessoaFisica(result.GetInt32(0), result.GetString(1), result.GetString(2), result.GetDateTime(3));
-
-                var endereco = new Endereco(result.GetInt32(4), result.GetString(5), result.GetString(6), result.GetInt32(7), result.GetString(8), result.GetString(9), result.GetString(10), result.GetString(11));
-
-                endereco.IncluirDadosComplementares(result.GetString(12), result.GetString(13), result.GetString(14), result.GetString(15));
-
-                pessoa.AtualizarEndereco(endereco);
-
-                pessoasFisicas.Add(pessoa);
-            }
+            var pessoasFisicas = await conn.QueryAsync<PessoaFisica, Endereco, PessoaFisica>(
+                query,
+                (pessoa, endereco) =>
+                {
+                    if (endereco != null)
+                    {
+                        endereco.IncluirDadosComplementares(endereco.Estado, endereco.UF, endereco.Localidade, endereco.Ddd);
+                        pessoa.AtualizarEndereco(endereco);
+                    }
+                    return pessoa;
+                },
+                splitOn: "EnderecoId"
+            );
 
             return pessoasFisicas;
         }
@@ -95,32 +90,32 @@ namespace CadastroDigital.Infrastructure
         public async Task<PessoaFisica?> ObterAsync(int id)
         {
             await using var conn = new SqlConnection(_connectionString);
-            await conn.OpenAsync();
 
-            await using var cmd = new SqlCommand(@"SELECT PF.Id, PF.Cpf, PF.Nome, PF.DataNascimento, 
-                                        E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, E.Complemento, E.Bairro, E.Cidade, E.Estado, E.UF, E.Localidade, E.DDD, E.IBGE
-                                    FROM PessoasFisicas PF
-                                    LEFT JOIN Enderecos E ON PF.EnderecoId = E.Id
-                                    WHERE PF.Id = @Id", conn);
+            var query = @"SELECT PF.Id, PF.Cpf, PF.Nome, PF.DataNascimento, 
+                         E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, 
+                         E.Complemento, E.Bairro, E.Cidade, E.Estado, E.UF, 
+                         E.Localidade, E.DDD, E.IBGE
+                  FROM PessoasFisicas PF
+                  LEFT JOIN Enderecos E ON PF.EnderecoId = E.Id
+                        WHERE PF.Id = @Id";
 
-            cmd.Parameters.AddWithValue("@Id", id);
+            var pessoa = conn.Query<PessoaFisica, Endereco, PessoaFisica>(
+                query,
+                (pessoa, endereco) =>
+                {
+                    if (endereco != null)
+                    {
+                        endereco.IncluirDadosComplementares(endereco.Estado, endereco.UF, endereco.Localidade, endereco.Ddd);
+                        pessoa.AtualizarEndereco(endereco);
+                    }
 
-            var result = await cmd.ExecuteReaderAsync();
+                    return pessoa;
+                },
+                new { Id = id },
+                splitOn: "EnderecoId"
+            ).FirstOrDefault();
 
-            if (result.Read())
-            {
-                var pessoa = new PessoaFisica(result.GetInt32(0), result.GetString(1), result.GetString(2), result.GetDateTime(3));
-
-                var endereco = new Endereco(result.GetInt32(4), result.GetString(5), result.GetString(6), result.GetInt32(7), result.GetString(8), result.GetString(9), result.GetString(10), result.GetString(11));
-
-                endereco.IncluirDadosComplementares(result.GetString(12), result.GetString(13), result.GetString(14), result.GetString(15));
-
-                pessoa.AtualizarEndereco(endereco);
-
-                return pessoa;
-            }
-
-            return null;
+            return pessoa;
         }
 
         public async Task<bool> VerificarExistenciaRegistro(PessoaFisica pessoa)
