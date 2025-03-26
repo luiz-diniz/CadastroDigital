@@ -11,12 +11,14 @@ namespace CadastroDigital.Application.Services
         private readonly ILogger<IPessoaService<T>> _logger;
         private readonly IPessoaRepository<T> _pessoaRepository;
         private readonly IEnderecoService _enderecoService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public PessoaService(ILogger<IPessoaService<T>> logger, IPessoaRepository<T> pessoaRepository, IEnderecoService enderecoService)
+        public PessoaService(ILogger<IPessoaService<T>> logger, IPessoaRepository<T> pessoaRepository, IEnderecoService enderecoService, IUnitOfWork unitOfWork)
         {
             _logger = logger;
             _pessoaRepository = pessoaRepository;
             _enderecoService = enderecoService;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task AtualizarAsync(T pessoa)
@@ -40,22 +42,28 @@ namespace CadastroDigital.Application.Services
         }
 
         public async Task<int> CriarAsync(T pessoa)
-        {
+        {            
             try
             {
                 if(await _pessoaRepository.VerificarExistenciaRegistro(pessoa))
                     throw new EntityAlreadyExistsException($"Registro com o documento já encontrado");
                 
+                _unitOfWork.BeginTransaction();
+
                 var idEndereco = await _enderecoService.CriarAsync(pessoa.Endereco);
 
                 pessoa.Endereco.AtribuirId(idEndereco);
 
                 var id = await _pessoaRepository.CriarAsync(pessoa);
 
+                _unitOfWork.CommitTransaction();
+
                 return id;
             }
             catch (Exception ex)
             {
+                _unitOfWork.RollbackTransaction();
+
                 _logger.LogError(ex, ex.Message);
                 throw;
             }
@@ -70,12 +78,18 @@ namespace CadastroDigital.Application.Services
                 if(pessoa is null)
                     throw new EntityNotFoundException($"Registro com o [{id}] não encontrado");
 
+                _unitOfWork.BeginTransaction();
+
                 await _enderecoService.ExcluirAsync(pessoa.Endereco.Id);
 
                 await _pessoaRepository.ExcluirAsync(id);
+
+                _unitOfWork.CommitTransaction();
             }
             catch (Exception ex)
             {
+                _unitOfWork.RollbackTransaction();
+
                 _logger.LogError(ex, ex.Message);
                 throw;
             }

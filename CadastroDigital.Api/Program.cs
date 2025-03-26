@@ -12,18 +12,16 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddLogging();
 builder.Services.AddHttpClient<IIntegracaoCep, IntegracaoViaCepService>();
 
-var connectionString = builder.Configuration.GetConnectionString("Default");
+builder.Services.AddScoped<DbSession>();
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
-if(string.IsNullOrEmpty(connectionString))
-    throw new ArgumentNullException("Connection string null");
+builder.Services.AddTransient<IPessoaRepository<PessoaFisica>, PessoaFisicaRepository>();
+builder.Services.AddTransient<IPessoaRepository<PessoaJuridica>, PessoaJuridicaRepository>();
+builder.Services.AddTransient<IEnderecoRepository, EnderecoRepository>();
 
-builder.Services.AddSingleton<IPessoaRepository<PessoaFisica>>(new PessoaFisicaRepository(connectionString));
-builder.Services.AddSingleton<IPessoaRepository<PessoaJuridica>>(new PessoaJuridicaRepository(connectionString));
-builder.Services.AddSingleton<IEnderecoRepository>(new EnderecoRepository(connectionString));
-
-builder.Services.AddSingleton(typeof(IPessoaService<>), typeof(PessoaService<>));
-builder.Services.AddSingleton<IEnderecoService, EnderecoService>();
-builder.Services.AddSingleton<IIntegracaoCep, IntegracaoViaCepService>();
+builder.Services.AddTransient(typeof(IPessoaService<>), typeof(PessoaService<>));
+builder.Services.AddTransient<IEnderecoService, EnderecoService>();
+builder.Services.AddTransient<IIntegracaoCep, IntegracaoViaCepService>();
 
 var app = builder.Build();
 

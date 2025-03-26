@@ -1,161 +1,115 @@
 ﻿using CadastroDigital.Domain.Entities;
-using CadastroDigital.Domain.Entities.Enums;
 using CadastroDigital.Domain.Ports.Repository;
-using Microsoft.Data.SqlClient;
+using Dapper;
 
 namespace CadastroDigital.Infrastructure
 {
     public class PessoaJuridicaRepository : IPessoaJuridicaRepository
     {
-        private readonly string _connectionString;
+        private readonly DbSession _session;
 
-        public PessoaJuridicaRepository(string connectionString)
+        public PessoaJuridicaRepository(DbSession session)
         {
-            _connectionString = connectionString;
+            _session = session;
         }
 
         public async Task AtualizarAsync(PessoaJuridica pessoaJuridica)
         {
-            await using var conn = new SqlConnection(_connectionString);
-            await conn.OpenAsync();
-
             var query = @"UPDATE PessoasJuridicas SET Cnpj = @Cnpj, RazaoSocial = @RazaoSocial, NomeFantasia = @NomeFantasia, 
                                 DataAbertura = @DataAbertura, SituacaoCadastral = @SituacaoCadastral WHERE Id = @Id";
 
-            await using var cmd = new SqlCommand(query, conn);
-
-            cmd.Parameters.AddWithValue("Id", pessoaJuridica.Id);
-            cmd.Parameters.AddWithValue("Cnpj", pessoaJuridica.Cnpj);
-            cmd.Parameters.AddWithValue("RazaoSocial", pessoaJuridica.RazaoSocial);
-            cmd.Parameters.AddWithValue("NomeFantasia", pessoaJuridica.NomeFantasia);
-            cmd.Parameters.AddWithValue("DataAbertura", pessoaJuridica.DataAbertura);
-            cmd.Parameters.AddWithValue("SituacaoCadastral", pessoaJuridica.SituacaoCadastral);
-
-            await cmd.ExecuteNonQueryAsync();
+            _session.Connection.Execute(query, new
+            {
+                pessoaJuridica.Id,
+                pessoaJuridica.Cnpj,
+                pessoaJuridica.RazaoSocial,
+                pessoaJuridica.NomeFantasia,
+                pessoaJuridica.DataAbertura,
+                pessoaJuridica.SituacaoCadastral
+            });
         }
 
         public async Task<int> CriarAsync(PessoaJuridica pessoaJuridica)
         {
-            await using var conn = new SqlConnection(_connectionString);
-            await conn.OpenAsync();
-
             var query = @"INSERT INTO PessoasJuridicas (Cnpj, RazaoSocial, NomeFantasia, DataAbertura, SituacaoCadastral, EnderecoId) 
                             OUTPUT Inserted.Id VALUES (@Cnpj, @RazaoSocial, @NomeFantasia, @DataAbertura, @SituacaoCadastral, @EnderecoId)";
 
-            await using var cmd = new SqlCommand(query, conn);
+            var result = _session.Connection.QuerySingle<int>(query, new
+            {
+                pessoaJuridica.Cnpj,
+                pessoaJuridica.RazaoSocial,
+                pessoaJuridica.NomeFantasia,
+                pessoaJuridica.DataAbertura,
+                pessoaJuridica.SituacaoCadastral,
+                EnderecoId = pessoaJuridica.Endereco.Id
+            });
 
-            cmd.Parameters.AddWithValue("Cnpj", pessoaJuridica.Cnpj);
-            cmd.Parameters.AddWithValue("RazaoSocial", pessoaJuridica.RazaoSocial);
-            cmd.Parameters.AddWithValue("NomeFantasia", pessoaJuridica.NomeFantasia);
-            cmd.Parameters.AddWithValue("DataAbertura", pessoaJuridica.DataAbertura);
-            cmd.Parameters.AddWithValue("SituacaoCadastral", (int) pessoaJuridica.SituacaoCadastral);
-            cmd.Parameters.AddWithValue("EnderecoId", pessoaJuridica.Endereco.Id);
-
-            var result = await cmd.ExecuteScalarAsync();
-
-            return (int)result!;
+            return result;
         }
 
         public async Task ExcluirAsync(int id)
         {
-            await using var conn = new SqlConnection(_connectionString);
-            await conn.OpenAsync();
+            var query = "DELETE FROM PessoasJuridicas WHERE Id = @Id";
 
-            await using var cmd = new SqlCommand("DELETE FROM PessoasJuridicas WHERE Id = @Id", conn);
-
-            cmd.Parameters.AddWithValue("Id", id);
-
-            await cmd.ExecuteNonQueryAsync();
+            _session.Connection.Execute(query, new { id }, _session.Transaction);
         }
 
         public async Task<IEnumerable<PessoaJuridica>> ListarAsync()
         {
-            await using var conn = new SqlConnection(_connectionString);
-            await conn.OpenAsync();
-
-            await using var cmd = new SqlCommand(@"
-                                SELECT PJ.Id, PJ.Cnpj, PJ.RazaoSocial, PJ.NomeFantasia, PJ.DataAbertura, PJ.SituacaoCadastral, 
+            var query = @"SELECT PJ.Id, PJ.Cnpj, PJ.RazaoSocial, PJ.NomeFantasia, PJ.DataAbertura, PJ.SituacaoCadastral, 
                                         E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, E.Complemento, E.Bairro, E.Cidade, E.Estado, E.UF, E.Localidade, E.DDD, E.IBGE
                                 FROM PessoasJuridicas PJ
-                                LEFT JOIN Enderecos E ON PJ.EnderecoId = E.Id", conn);
+                                LEFT JOIN Enderecos E ON PJ.EnderecoId = E.Id";
 
-            var result = await cmd.ExecuteReaderAsync();
+            var pessoasFisicas = await _session.Connection.QueryAsync<PessoaJuridica, Endereco, PessoaJuridica>(
+                query,
+                (pessoa, endereco) =>
+                {
+                    if (endereco != null)
+                    {
+                        endereco.IncluirDadosComplementares(endereco.Estado, endereco.UF, endereco.Localidade, endereco.Ddd);
+                        pessoa.AtualizarEndereco(endereco);
+                    }
+                    return pessoa;
+                }
+            );
 
-            var pessoasJuridicas = new List<PessoaJuridica>();
-
-            while (await result.ReadAsync())
-            {
-                var pessoa = new PessoaJuridica(result.GetInt32(0), result.GetString(1), result.GetString(2), result.GetString(3), result.GetDateTime(4), ObterSituacaoCadastral(result.GetInt32(5)));
-
-                var endereco = new Endereco(result.GetInt32(6), result.GetString(7), result.GetString(8), result.GetInt32(9), result.GetString(10), result.GetString(11), result.GetString(12), result.GetString(13));
-
-                endereco.IncluirDadosComplementares(result.GetString(12), result.GetString(13), result.GetString(14), result.GetString(15));
-
-                pessoa.AtualizarEndereco(endereco);
-
-                pessoasJuridicas.Add(pessoa);
-            }
-
-            return pessoasJuridicas;
+            return pessoasFisicas;
         }
 
         public async Task<PessoaJuridica?> ObterAsync(int id)
         {
-            await using var conn = new SqlConnection(_connectionString);
-            await conn.OpenAsync();
-
-            await using var cmd = new SqlCommand(@"
-                                SELECT PJ.Id, PJ.Cnpj, PJ.RazaoSocial, PJ.NomeFantasia, PJ.DataAbertura, PJ.SituacaoCadastral, 
+            var query = @"SELECT PJ.Id, PJ.Cnpj, PJ.RazaoSocial, PJ.NomeFantasia, PJ.DataAbertura, PJ.SituacaoCadastral, 
                                         E.Id AS EnderecoId, E.Cep, E.Logradouro, E.Numero, E.Complemento, E.Bairro, E.Cidade, E.Estado, E.UF, E.Localidade, E.DDD, E.IBGE
                                 FROM PessoasJuridicas PJ
                                 LEFT JOIN Enderecos E ON PJ.EnderecoId = E.Id
-                                WHERE PJ.Id = @Id", conn);
+                                WHERE PJ.Id = @Id";
 
-            cmd.Parameters.AddWithValue("@Id", id);
+            var pessoa = _session.Connection.Query<PessoaJuridica, Endereco, PessoaJuridica>(
+                query,
+                (pessoa, endereco) =>
+                {
+                    if (endereco != null)
+                    {
+                        endereco.IncluirDadosComplementares(endereco.Estado, endereco.UF, endereco.Localidade, endereco.Ddd);
+                        pessoa.AtualizarEndereco(endereco);
+                    }
 
-            var result = await cmd.ExecuteReaderAsync();
+                    return pessoa;
+                },
+                new { Id = id }
+            ).FirstOrDefault();
 
-            if (result.Read())
-            {
-                var pessoa = new PessoaJuridica(result.GetInt32(0), result.GetString(1), result.GetString(2), result.GetString(3), result.GetDateTime(4), ObterSituacaoCadastral(result.GetInt32(5)));
-
-                var endereco = new Endereco(result.GetInt32(6), result.GetString(7), result.GetString(8), result.GetInt32(9), result.GetString(10), result.GetString(11), result.GetString(12), result.GetString(13));
-
-                endereco.IncluirDadosComplementares(result.GetString(12), result.GetString(13), result.GetString(14), result.GetString(15));
-
-                pessoa.AtualizarEndereco(endereco);
-
-                return pessoa;
-            }
-
-            return null;
+            return pessoa;
         }
 
         public async Task<bool> VerificarExistenciaRegistro(PessoaJuridica pessoa)
         {
-            await using var conn = new SqlConnection(_connectionString);
-            await conn.OpenAsync();
+            var query = "SELECT COUNT(1) FROM PessoasJuridicas WHERE Cnpj = @Cnpj";
 
-            await using var cmd = new SqlCommand("SELECT COUNT(1) FROM PessoasJuridicas WHERE Cnpj = @Cnpj", conn);
+            var result = _session.Connection.QuerySingle<int>(query, new { pessoa.Cnpj });
 
-            cmd.Parameters.AddWithValue("Cnpj", pessoa.Cnpj);
-
-            var result = await cmd.ExecuteScalarAsync();
-
-            return (int)result! > 0;
-        }
-
-        private SituacaoCadastralEnum ObterSituacaoCadastral(int situacao)
-        {
-            return situacao switch
-            {
-                1 => SituacaoCadastralEnum.Regular,
-                2 => SituacaoCadastralEnum.Ativo,
-                3 => SituacaoCadastralEnum.Cancelado,
-                4 => SituacaoCadastralEnum.Inativo,
-                5 => SituacaoCadastralEnum.Extinto,
-                _ => SituacaoCadastralEnum.Desconhecida
-            };
+            return result > 0;
         }
     }
 }
