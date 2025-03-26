@@ -2,6 +2,7 @@
 
 namespace CadastroDigital.Domain.Ports.Repository
 {
+    //TODO: Avaliar necessidade de uso do Async
     public interface IPessoaRepository<T> where T : PessoaBase
     {
         Task<int> CriarAsync(T pessoa);
