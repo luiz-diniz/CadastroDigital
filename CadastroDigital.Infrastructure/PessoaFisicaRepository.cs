@@ -80,8 +80,7 @@ namespace CadastroDigital.Infrastructure
                         pessoa.AtualizarEndereco(endereco);
                     }
                     return pessoa;
-                },
-                splitOn: "Id"
+                }
             );
 
             return pessoasFisicas;
@@ -111,8 +110,7 @@ namespace CadastroDigital.Infrastructure
 
                     return pessoa;
                 },
-                new { Id = id },
-                splitOn: "Id"
+                new { Id = id }
             ).FirstOrDefault();
 
             return pessoa;
