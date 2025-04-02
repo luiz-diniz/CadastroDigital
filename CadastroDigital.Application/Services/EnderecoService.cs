@@ -24,6 +24,9 @@ namespace CadastroDigital.Application.Services
         {
             try
             {
+                if(endereco is null)
+                    throw new ArgumentNullException(nameof(endereco));
+
                 await _enderecoRepository.AtualizarAsync(endereco);
             }
             catch (Exception ex)
